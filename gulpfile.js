@@ -2,10 +2,11 @@ var gulp = require('gulp');
 var autoprefixer = require('autoprefixer');
 var $ = require('gulp-load-plugins')();
 var mainBowerFiles = require('main-bower-files');
+var browserSync = require('browser-sync').create();
 
 gulp.task('copyHTML', function () {
   return gulp.src('./source/**/*.html')
-    .pipe(gulp.dest('./public/'))
+    .pipe(gulp.dest('./public/'));
 });
 
 gulp.task('jade', function() {
@@ -16,6 +17,7 @@ gulp.task('jade', function() {
       pretty: true
     }))
     .pipe(gulp.dest('./public/'))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('sass', function () {
@@ -33,7 +35,8 @@ gulp.task('sass', function () {
     // .pipe(postcss(plugins))
     .pipe($.postcss( [autoprefixer()] ))  // 直接引入 autoprefixer
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest('./public/css/'));
+    .pipe(gulp.dest('./public/css/'))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('babel', () => {
@@ -46,6 +49,7 @@ gulp.task('babel', () => {
     .pipe($.concat('all.js'))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./public/js/'))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('bower', function() {
@@ -63,7 +67,18 @@ gulp.task('vendorJs', () => {
     'bootstrap.js'
   ]))
   .pipe($.concat('vendors.js'))
-  .pipe(gulp.dest('./public/js/'))
+  .pipe(gulp.dest('./public/js/'));
+});
+
+gulp.task('browser-sync', function() {
+  browserSync.init({
+      server: {
+          baseDir: "./public"
+      }
+  });
+  gulp.watch("./source/scss/**/*.scss", gulp.series('sass'));
+  gulp.watch('./source/**/*.js', gulp.series('babel'));
+  gulp.watch("./source/**/*.jade").on('change', browserSync.reload);
 });
 
 gulp.task('watch', function () {
@@ -73,5 +88,6 @@ gulp.task('watch', function () {
 });
 
 gulp.task('default', 
-  gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'watch')
+  // gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'browser-sync', 'watch')
+  gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'browser-sync')
 );
