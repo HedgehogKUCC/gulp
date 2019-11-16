@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var autoprefixer = require('autoprefixer');
 var $ = require('gulp-load-plugins')();
+var mainBowerFiles = require('main-bower-files');
 
 gulp.task('copyHTML', function () {
   return gulp.src('./source/**/*.html')
@@ -47,6 +48,24 @@ gulp.task('babel', () => {
     .pipe(gulp.dest('./public/js/'))
 });
 
+gulp.task('bower', function() {
+  return gulp.src(mainBowerFiles())
+      .pipe(gulp.dest('./.tmp/vendors'))
+});
+
+gulp.task('vendorJs', () => {
+  return gulp.src([
+    './.tmp/vendors/**/*.js',
+    './node_modules/bootstrap/dist/js/bootstrap.bundle.min.js'
+  ])
+  .pipe($.order([
+    'jquery.js',
+    'bootstrap.js'
+  ]))
+  .pipe($.concat('vendors.js'))
+  .pipe(gulp.dest('./public/js/'))
+});
+
 gulp.task('watch', function () {
   gulp.watch('./source/scss/**/*.scss', gulp.series('sass'));
   gulp.watch('./source/**/*.jade', gulp.series('jade'));
@@ -54,5 +73,5 @@ gulp.task('watch', function () {
 });
 
 gulp.task('default', 
-  gulp.parallel('jade', 'sass', 'babel', 'watch')
+  gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'watch')
 );

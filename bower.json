@@ -1,0 +1,20 @@
+{
+  "name": "demogulp",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "HedgehogKU <ccc908925@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/HedgehogKUCC/gulp",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.4.1"
+  }
+}
