@@ -116,6 +116,11 @@ gulp.task('watch', function () {
   gulp.watch('./source/**/*.js', gulp.series('babel'));
 });
 
+gulp.task('d', () => {
+  return gulp.src('./public/**/*')
+    .pipe($.ghPages());
+});
+
 gulp.task('build',
   gulp.series(
     'clean',
