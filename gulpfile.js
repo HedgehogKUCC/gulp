@@ -13,6 +13,11 @@ var envOptions = {
 var options = minimist(process.argv.slice(2), envOptions);
 console.log(options);
 
+gulp.task('clean', function () {
+  return gulp.src(['./.tmp', './public'], {read: false, allowEmpty: true})
+      .pipe($.clean());
+});
+
 gulp.task('copyHTML', function () {
   return gulp.src('./source/**/*.html')
     .pipe(gulp.dest('./public/'));
@@ -89,7 +94,7 @@ gulp.task('vendorJs', () => {
   .pipe(gulp.dest('./public/js/'));
 });
 
-gulp.task('browser-sync', function() {
+gulp.task('s', function() {
   browserSync.init({
       server: { baseDir: "./public" },
       reloadDebounce: 2000
@@ -105,7 +110,15 @@ gulp.task('watch', function () {
   gulp.watch('./source/**/*.js', gulp.series('babel'));
 });
 
+gulp.task('build',
+  gulp.series(
+    'clean',
+    gulp.parallel('jade', 'sass', 'babel', 'bower'),
+    'vendorJs'
+  )
+);
+
 gulp.task('default', 
   // gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'browser-sync', 'watch')
-  gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'browser-sync')
+  gulp.series('clean', 'jade', 'sass', 'babel', 'bower','vendorJs', 's')
 );
