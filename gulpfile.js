@@ -38,18 +38,13 @@ gulp.task('jade', function() {
 });
 
 gulp.task('sass', function () {
-
-  // var plugins = [
-  //   autoprefixer({ overrideBrowserslist: [ 'last 3 version', '> 5%', 'ie 6-8' ] })
-  // ];
-
   return gulp.src('./source/scss/**/*.scss')
     .pipe($.plumber())
     .pipe($.sourcemaps.init())
-    .pipe($.sass().on('error', $.sass.logError))
-    // 編譯完成 CSS
-
-    // .pipe(postcss(plugins))
+    .pipe($.sass({
+      outputStyle: 'expended',
+      includePaths: ['./node_modules/bootstrap/scss']
+    }).on('error', $.sass.logError))
     .pipe($.postcss( [autoprefixer()] ))  // 直接引入 autoprefixer
     .pipe($.if(options.env === 'production', $.cleanCss()))
     .pipe($.sourcemaps.write('.'))
@@ -87,7 +82,7 @@ gulp.task('vendorJs', () => {
   ])
   .pipe($.order([
     'jquery.js',
-    'bootstrap.js'
+    'bootstrap.bundle.min.js'
   ]))
   .pipe($.concat('vendors.js'))
   .pipe($.if(options.env === 'production', $.uglify()))
@@ -99,9 +94,9 @@ gulp.task('s', function() {
       server: { baseDir: "./public" },
       reloadDebounce: 2000
   });
-  gulp.watch("./source/scss/**/*.scss", gulp.series('sass'));
+  gulp.watch('./source/scss/**/*.scss', gulp.series('sass'));
   gulp.watch('./source/**/*.js', gulp.series('babel'));
-  gulp.watch("./source/**/*.jade").on('change', browserSync.reload);
+  gulp.watch('./source/**/*.jade', gulp.series('jade')).on('change', browserSync.reload);
 });
 
 gulp.task('image-min', () => {
@@ -124,9 +119,8 @@ gulp.task('d', () => {
 gulp.task('build',
   gulp.series(
     'clean',
-    gulp.parallel('jade', 'sass', 'babel', 'bower'),
-    'vendorJs',
-    'image-min'
+    gulp.parallel('jade', 'sass', 'babel', 'bower', 'image-min'),
+    'vendorJs'
   )
 );
 
@@ -135,5 +129,6 @@ gulp.task('default',
     'clean',
     gulp.parallel('jade', 'sass', 'babel', 'bower', 'image-min'),
     'vendorJs',
+    's'
   )
 );
