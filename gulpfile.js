@@ -34,6 +34,7 @@ gulp.task('sass', function () {
 
     // .pipe(postcss(plugins))
     .pipe($.postcss( [autoprefixer()] ))  // 直接引入 autoprefixer
+    .pipe($.cleanCss())
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./public/css/'))
     .pipe(browserSync.stream());
@@ -47,6 +48,11 @@ gulp.task('babel', () => {
       presets: ['@babel/env']
     }))
     .pipe($.concat('all.js'))
+    .pipe($.uglify({
+      compress: {
+        drop_console: true
+      }
+    }))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./public/js/'))
     .pipe(browserSync.stream());
@@ -67,6 +73,7 @@ gulp.task('vendorJs', () => {
     'bootstrap.js'
   ]))
   .pipe($.concat('vendors.js'))
+  .pipe($.uglify())
   .pipe(gulp.dest('./public/js/'));
 });
 
