@@ -1,10 +1,5 @@
-$primary-color: red;
+@import "functions";
+@import "helpers/variables";
+@import "mixins";
 
-body {
-  color: $primary-color;
-}
-
-.card {
-  transform: rotate(120deg);
-  filter: blur(3px);
-}
+@import 'bootstrap';
