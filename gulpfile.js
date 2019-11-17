@@ -27,6 +27,17 @@ gulp.task('jade', function() {
  
   return gulp.src('./source/**/*.jade')
     .pipe($.plumber())
+    .pipe($.data(function () {
+
+      var khData = require('./source/data/data.json');
+      var menu = require('./source/data/menu.json');
+
+      var source = {
+        'khData': khData,
+        'menu': menu
+      };
+      return source;
+    }))
     .pipe($.if(options.env === 'develop', $.jade({
       pretty: true
     })))
