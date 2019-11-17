@@ -104,6 +104,12 @@ gulp.task('s', function() {
   gulp.watch("./source/**/*.jade").on('change', browserSync.reload);
 });
 
+gulp.task('image-min', () => {
+  return gulp.src('./source/images/*')
+    .pipe($.if(options.env === 'production', $.imagemin()))
+    .pipe(gulp.dest('./public/images/'))
+});
+
 gulp.task('watch', function () {
   gulp.watch('./source/scss/**/*.scss', gulp.series('sass'));
   gulp.watch('./source/**/*.jade', gulp.series('jade'));
@@ -114,11 +120,15 @@ gulp.task('build',
   gulp.series(
     'clean',
     gulp.parallel('jade', 'sass', 'babel', 'bower'),
-    'vendorJs'
+    'vendorJs',
+    'image-min'
   )
 );
 
 gulp.task('default', 
-  // gulp.series('jade', 'sass', 'babel', 'bower','vendorJs', 'browser-sync', 'watch')
-  gulp.series('clean', 'jade', 'sass', 'babel', 'bower','vendorJs', 's')
+  gulp.series(
+    'clean',
+    gulp.parallel('jade', 'sass', 'babel', 'bower', 'image-min'),
+    'vendorJs',
+  )
 );
