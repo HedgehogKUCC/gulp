@@ -1,1 +1,0 @@
-[My BLOG - Gulp Quick Start](http://localhost:4000/2019/11/16/2019-11-16-gulp/)
