@@ -3,6 +3,15 @@ var autoprefixer = require('autoprefixer');
 var $ = require('gulp-load-plugins')();
 var mainBowerFiles = require('main-bower-files');
 var browserSync = require('browser-sync').create();
+var minimist = require('minimist');
+
+var envOptions = {
+  string: 'env',
+  default: { env: 'develop' }
+}
+
+var options = minimist(process.argv.slice(2), envOptions);
+console.log(options);
 
 gulp.task('copyHTML', function () {
   return gulp.src('./source/**/*.html')
@@ -13,9 +22,12 @@ gulp.task('jade', function() {
  
   return gulp.src('./source/**/*.jade')
     .pipe($.plumber())
-    .pipe($.jade({
+    .pipe($.if(options.env === 'develop', $.jade({
       pretty: true
-    }))
+    })))
+    .pipe($.if(options.env === 'production', $.jade({
+      pretty: false
+    })))
     .pipe(gulp.dest('./public/'))
     .pipe(browserSync.stream());
 });
@@ -34,7 +46,7 @@ gulp.task('sass', function () {
 
     // .pipe(postcss(plugins))
     .pipe($.postcss( [autoprefixer()] ))  // 直接引入 autoprefixer
-    .pipe($.cleanCss())
+    .pipe($.if(options.env === 'production', $.cleanCss()))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./public/css/'))
     .pipe(browserSync.stream());
@@ -48,11 +60,11 @@ gulp.task('babel', () => {
       presets: ['@babel/env']
     }))
     .pipe($.concat('all.js'))
-    .pipe($.uglify({
+    .pipe($.if(options.env === 'production', $.uglify({
       compress: {
         drop_console: true
       }
-    }))
+    })))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest('./public/js/'))
     .pipe(browserSync.stream());
@@ -73,15 +85,14 @@ gulp.task('vendorJs', () => {
     'bootstrap.js'
   ]))
   .pipe($.concat('vendors.js'))
-  .pipe($.uglify())
+  .pipe($.if(options.env === 'production', $.uglify()))
   .pipe(gulp.dest('./public/js/'));
 });
 
 gulp.task('browser-sync', function() {
   browserSync.init({
-      server: {
-          baseDir: "./public"
-      }
+      server: { baseDir: "./public" },
+      reloadDebounce: 2000
   });
   gulp.watch("./source/scss/**/*.scss", gulp.series('sass'));
   gulp.watch('./source/**/*.js', gulp.series('babel'));

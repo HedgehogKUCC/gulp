@@ -23,6 +23,7 @@
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.2.0",
     "gulp-concat": "^2.6.1",
+    "gulp-if": "^3.0.0",
     "gulp-jade": "^1.1.0",
     "gulp-load-plugins": "^2.0.1",
     "gulp-order": "^1.2.0",
@@ -31,6 +32,7 @@
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
-    "main-bower-files": "^2.13.3"
+    "main-bower-files": "^2.13.3",
+    "minimist": "^1.2.0"
   }
 }
